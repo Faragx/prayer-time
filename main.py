@@ -75,7 +75,18 @@ class PrayerApp:
         # Create prayer time cards
         for prayer, time in self.prayer_times.items():
             date = datetime.now().strftime("%I:%M %p")
-            if date < time:
+            d=date.replace(":",".")
+            t=time.replace(":",".")
+            d = float(d[:-3])
+            t = float(t[:-3])
+            if date.endswith("PM") and int(d)!=12 :
+                d=d+12
+            if time.endswith("PM") and int(t)!=12:
+                t=t+12
+            print(d,t)
+            print(type(d))
+            print(type(t))
+            if d < t:
                 self.create_prayer_card_intime(prayer, time)
             else:
                 self.create_prayer_card(prayer, time)
