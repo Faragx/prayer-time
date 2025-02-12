@@ -3,14 +3,12 @@ import pandas as pd
 from datetime import datetime
 from PIL import Image
 import pygame
-import time
 
 pygame.mixer.init()
 AZAN_SOUND = "abd_albaset.mp3"
 def play_azan():
         pygame.mixer.music.load(AZAN_SOUND)
         pygame.mixer.music.play()
-
 
 def prayer_time():
     db = pd.read_excel("all_prayer_time.xlsx")
@@ -53,7 +51,6 @@ class PrayerApp:
                                        ,text_color_disabled="black",fg_color="transparent",command=self.stop_azan)
         self.timer_label.pack()
         
-
         # Day of the week and date
         self.day = ctk.CTkLabel(self.fram1,text=f"{times.iloc[0,15]}\n{times.iloc[0,13].strftime("%d-%m-%Y")}📅",font=("Arial", 28, "bold")
                                 , text_color="#184D47",fg_color="transparent")
@@ -73,6 +70,7 @@ class PrayerApp:
         }
 
         # Create prayer time cards
+        n=1
         for prayer, time in self.prayer_times.items():
             date = datetime.now().strftime("%I:%M %p")
             d=date.replace(":",".")
@@ -83,10 +81,8 @@ class PrayerApp:
                 d=d+12
             if time.endswith("PM") and int(t)!=12:
                 t=t+12
-            print(d,t)
-            print(type(d))
-            print(type(t))
-            if d < t:
+            if d < t and n==1:
+                n+=1
                 self.create_prayer_card_intime(prayer, time)
             else:
                 self.create_prayer_card(prayer, time)
@@ -113,17 +109,17 @@ class PrayerApp:
 
     def create_prayer_card_intime(self, prayer_name, prayer_time):
         frame = ctk.CTkFrame(
-            self.root, fg_color="green",bg_color="green",
+            self.root, fg_color="#1e8449",bg_color="#1e8449",
             corner_radius=0,border_width=3,border_color="#566573")
         frame.pack(pady=10, padx=10, fill="x")
 
         # Prayer Name Label (Right-aligned for Arabic layout)
-        prayer_label = ctk.CTkLabel(frame, text=prayer_name, font=("Arial", 30, "bold"), text_color="#154360")
+        prayer_label = ctk.CTkLabel(frame, text=prayer_name, font=("Arial", 30, "bold"), text_color="#eafaf1")
         prayer_label.pack(side="right", padx=25, pady=15)
 
         # Time Label (Left-aligned)
         time_label = ctk.CTkLabel(
-            frame, text=prayer_time, font=("Arial", 28, "bold"), text_color="#154360")
+            frame, text=prayer_time, font=("Arial", 28, "bold"), text_color="#eafaf1")
         time_label.pack(side="left", padx=25, pady=15)
 
 
@@ -141,14 +137,13 @@ class PrayerApp:
                 minutes, seconds = divmod(remainder, 60)
                 self.timer_label.configure(text=f"{hours:02}:{minutes:02}:{seconds:02}⏳",fg_color="transparent")
                 if seconds == 1 and minutes==0 and hours == 0:
-                    self.timer_label.configure(text="أذان الصلاة",fg_color="red")
+                    self.timer_label.configure(text="ايقاف الأذان",fg_color="red")
                     play_azan()
                 else:
                     self.root.after(1000, self.update_countdown)  # Update every second
                 return
         else:
             self.timer_label.configure(text="أنتهت صلاوات اليوم")
-
 
 # Run the application
 if __name__ == "__main__":
